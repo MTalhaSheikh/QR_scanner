@@ -106,10 +106,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 20),
         children: filters.entries.map((e) {
           final selected = _filter == e.key;
+          final isDark = Theme.of(context).brightness == Brightness.dark;
           return Padding(
             padding: const EdgeInsets.only(right: 8),
             child: ChoiceChip(
-              label: Text(e.value),
+              label: Text(
+                e.value,
+                style: TextStyle(
+                  color: selected
+                      ? Colors.white
+                      : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight),
+                ),
+              ),
               selected: selected,
               onSelected: (_) => setState(() => _filter = e.key),
             ),
@@ -166,7 +174,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
       child: Padding(
         padding: const EdgeInsets.only(bottom: 12),
         child: Material(
-          color: Theme.of(context).cardColor,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.darkCard
+              : AppColors.lightCard,
           borderRadius: BorderRadius.circular(20),
           child: InkWell(
             borderRadius: BorderRadius.circular(20),

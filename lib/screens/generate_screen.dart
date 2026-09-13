@@ -409,11 +409,16 @@ class _GenerateScreenState extends State<GenerateScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         children: options.entries.map((e) {
           final selected = _qrType == e.key;
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          final unselectedColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
           return Padding(
             padding: const EdgeInsets.only(right: 8),
             child: ChoiceChip(
-              avatar: Icon(e.value.$2, size: 16, color: selected ? Colors.white : null),
-              label: Text(e.value.$1),
+              avatar: Icon(e.value.$2, size: 16, color: selected ? Colors.white : unselectedColor),
+              label: Text(
+                e.value.$1,
+                style: TextStyle(color: selected ? Colors.white : unselectedColor),
+              ),
               selected: selected,
               onSelected: (_) => setState(() => _qrType = e.key),
             ),
@@ -438,10 +443,18 @@ class _GenerateScreenState extends State<GenerateScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         children: options.entries.map((e) {
           final selected = _barcodeType.runtimeType == e.value.runtimeType;
+          final isDark = Theme.of(context).brightness == Brightness.dark;
           return Padding(
             padding: const EdgeInsets.only(right: 8),
             child: ChoiceChip(
-              label: Text(e.key),
+              label: Text(
+                e.key,
+                style: TextStyle(
+                  color: selected
+                      ? Colors.white
+                      : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight),
+                ),
+              ),
               selected: selected,
               onSelected: (_) => setState(() => _barcodeType = e.value),
             ),

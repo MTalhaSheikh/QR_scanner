@@ -114,7 +114,9 @@ class ResultScreen extends StatelessWidget {
                         width: double.infinity,
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).cardColor,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? AppColors.darkCard
+                              : AppColors.lightCard,
                           borderRadius: BorderRadius.circular(22),
                           boxShadow: [
                             BoxShadow(

@@ -11,6 +11,7 @@ class AppTheme {
 
     return base.copyWith(
       scaffoldBackgroundColor: AppColors.lightBg,
+      cardColor: AppColors.lightCard,
       colorScheme: base.colorScheme.copyWith(
         primary: AppColors.primary,
         secondary: AppColors.accent,
@@ -77,6 +78,7 @@ class AppTheme {
 
     return base.copyWith(
       scaffoldBackgroundColor: AppColors.darkBg,
+      cardColor: AppColors.darkCard,
       colorScheme: base.colorScheme.copyWith(
         primary: AppColors.primaryLight,
         secondary: AppColors.accent,
