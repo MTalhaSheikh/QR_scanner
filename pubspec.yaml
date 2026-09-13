@@ -1,0 +1,58 @@
+name: qr_code
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # Camera scanning (QR + all major barcode symbologies)
+  mobile_scanner: ^5.2.3
+
+  # Pick an existing photo from the gallery to scan
+  image_picker: ^1.1.2
+
+  # QR code generation
+  qr_flutter: ^4.1.0
+
+  # Barcode generation (Code128, EAN13, UPC-A, Code39, etc.)
+  barcode_widget: ^2.0.4
+
+  # Local persistence for scan/generate history
+  shared_preferences: ^2.3.2
+
+  # Share generated codes / scanned results
+  share_plus: ^10.0.2
+
+  # Open links, dial numbers, compose email/SMS, connect wifi intents
+  url_launcher: ^6.3.0
+
+  # Camera / storage permissions
+  permission_handler: ^11.3.1
+
+  # File paths for saving generated code images
+  path_provider: ^2.1.4
+
+  # Capture a widget (QR/Barcode preview) as a PNG image
+  screenshot: ^3.0.0
+
+  # Nicely formatted dates in history
+  intl: ^0.19.0
+
+  # Typography
+  google_fonts: ^6.2.1
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
