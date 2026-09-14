@@ -1,4 +1,6 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../models/scan_record.dart';
@@ -43,6 +45,20 @@ class _ScanScreenState extends State<ScanScreen> {
 
   bool _torchOn = false;
   bool _isProcessing = false;
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
+  Future<void> _playScanFeedback() async {
+    // HapticFeedback.vibrate() triggers a real, short device buzz on both
+    // platforms; the "impact" style constants are tuned for iOS's Taptic
+    // Engine and are inconsistent-to-silent on a lot of Android hardware.
+    HapticFeedback.vibrate();
+    try {
+      await _audioPlayer.stop();
+      await _audioPlayer.play(AssetSource('sounds/beep.wav'), volume: 1.0);
+    } catch (_) {
+      // Never let a missing audio focus / muted device crash the scan flow.
+    }
+  }
 
   @override
   void initState() {
@@ -69,6 +85,7 @@ class _ScanScreenState extends State<ScanScreen> {
   @override
   void dispose() {
     _controller.dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -78,10 +95,15 @@ class _ScanScreenState extends State<ScanScreen> {
     final value = barcode?.rawValue;
     if (barcode == null || value == null || value.isEmpty) return;
 
+    // Confirm the catch with a real device buzz + an actual beep tone —
+    // more reliable than the OS "system click" sound, which is inaudible
+    // on a lot of Android devices.
+    _playScanFeedback();
+
     setState(() => _isProcessing = true);
     await _controller.stop();
 
-    final parsed = ContentParser.parse(value);
+    final parsed = ContentParser.parse(value, symbology: barcode.format.name);
     final record = ScanRecord(
       id: DateTime.now().microsecondsSinceEpoch.toString(),
       source: RecordSource.scanned,
@@ -123,7 +145,9 @@ class _ScanScreenState extends State<ScanScreen> {
     final value = capture.barcodes.first.rawValue;
     if (value == null || value.isEmpty) return;
 
-    final parsed = ContentParser.parse(value);
+    _playScanFeedback();
+
+    final parsed = ContentParser.parse(value, symbology: capture.barcodes.first.format.name);
     final record = ScanRecord(
       id: DateTime.now().microsecondsSinceEpoch.toString(),
       source: RecordSource.scanned,

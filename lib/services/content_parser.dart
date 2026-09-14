@@ -18,7 +18,15 @@ class ParsedContent {
 class ContentParser {
   ContentParser._();
 
-  static ParsedContent parse(String raw) {
+  /// Linear/1D symbologies almost always used for retail product barcodes
+  /// (mobile_scanner's `BarcodeFormat.name` values). These encode a bare
+  /// reference number, not a phone number — even though the digits alone
+  /// can look exactly like one.
+  static const _productBarcodeFormats = {
+    'upcA', 'upcE', 'ean8', 'ean13', 'code39', 'code93', 'code128', 'itf', 'codabar',
+  };
+
+  static ParsedContent parse(String raw, {String? symbology}) {
     final trimmed = raw.trim();
 
     if (RegExp(r'^https?://', caseSensitive: false).hasMatch(trimmed)) {
@@ -62,6 +70,13 @@ class ContentParser {
       final parts = trimmed.split(':');
       final number = parts.length > 1 ? parts[1].split(':').first : '';
       return ParsedContent(type: 'sms', title: number, subtitle: 'SMS message');
+    }
+
+    // A product barcode's digits can easily match the phone-number pattern
+    // below (e.g. a 12-digit UPC), so branch on the actual symbology first
+    // rather than guessing from the digits alone.
+    if (symbology != null && _productBarcodeFormats.contains(symbology)) {
+      return ParsedContent(type: 'barcode', title: trimmed, subtitle: 'Product barcode');
     }
 
     if (RegExp(r'^[\d+\-\s()]{6,}$').hasMatch(trimmed)) {

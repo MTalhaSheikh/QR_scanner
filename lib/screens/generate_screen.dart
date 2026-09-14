@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:screenshot/screenshot.dart';
@@ -24,6 +25,7 @@ class _GenerateScreenState extends State<GenerateScreen> {
   QrContentType _qrType = QrContentType.text;
   Barcode _barcodeType = Barcode.code128();
   Color _qrColor = AppColors.primary;
+  File? _logoImage;
 
   final _screenshotController = ScreenshotController();
 
@@ -106,6 +108,11 @@ class _GenerateScreenState extends State<GenerateScreen> {
   }
 
   Future<File> _captureImage() async {
+    // Give an embedded logo file image a brief moment to finish decoding
+    // before capturing, so it isn't missing from the exported PNG.
+    if (_isQr && _logoImage != null) {
+      await Future.delayed(const Duration(milliseconds: 150));
+    }
     final bytes = await _screenshotController.capture(pixelRatio: 3.0);
     final dir = await getTemporaryDirectory();
     final file = File(
@@ -136,6 +143,15 @@ class _GenerateScreenState extends State<GenerateScreen> {
     final t = _barcodeType.runtimeType.toString();
     return t.replaceAll('Barcode', '').toUpperCase();
   }
+
+  Future<void> _pickLogo() async {
+    final picker = ImagePicker();
+    final photo = await picker.pickImage(source: ImageSource.gallery, imageQuality: 90);
+    if (photo == null) return;
+    setState(() => _logoImage = File(photo.path));
+  }
+
+  void _removeLogo() => setState(() => _logoImage = null);
 
   Future<void> _shareCode() async {
     final file = await _captureImage();
@@ -176,6 +192,7 @@ class _GenerateScreenState extends State<GenerateScreen> {
               child: _isQr ? _buildQrTypeSelector(context) : _buildBarcodeTypeSelector(context),
             ),
             if (_isQr) SliverToBoxAdapter(child: _buildColorPicker(context)),
+            if (_isQr) SliverToBoxAdapter(child: _buildLogoPicker(context)),
             SliverPadding(
               // Bottom padding clears the root floating nav bar, since this
               // screen no longer pins its own action bar above it.
@@ -296,23 +313,71 @@ class _GenerateScreenState extends State<GenerateScreen> {
             controller: _screenshotController,
             child: Container(
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-              ),
+              // Deliberately NOT rounded: this exact container is what gets
+              // captured for Save/Share. A rounded corner here means the
+              // four corner triangles are genuinely transparent in the
+              // exported PNG — which viewers like WhatsApp's dark media
+              // preview render as solid black instead of "no background".
+              // A plain rectangle has no transparent pixels at all, so
+              // there's nothing for any viewer to render incorrectly. The
+              // rounded look in the app itself still comes from the
+              // gradient card framing it.
+              decoration: const BoxDecoration(color: Colors.white),
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 200),
                 child: _hasContent
                     ? (_isQr
-                        ? QrImageView(
+                        ? Stack(
                             key: const ValueKey('qr'),
-                            data: _qrData,
-                            version: QrVersions.auto,
-                            size: 200,
-                            backgroundColor: Colors.white,
-                            eyeStyle: QrEyeStyle(eyeShape: QrEyeShape.square, color: _qrColor),
-                            dataModuleStyle:
-                                QrDataModuleStyle(dataModuleShape: QrDataModuleShape.square, color: _qrColor),
+                            alignment: Alignment.center,
+                            children: [
+                              QrImageView(
+                                data: _qrData,
+                                version: QrVersions.auto,
+                                size: 200,
+                                backgroundColor: Colors.white,
+                                // A logo sitting on top of the code blocks
+                                // some of its data modules — bumping error
+                                // correction to the highest level (H, ~30%
+                                // recoverable) keeps it reliably scannable
+                                // with a logo on it.
+                                errorCorrectionLevel: _logoImage != null
+                                    ? QrErrorCorrectLevel.H
+                                    : QrErrorCorrectLevel.M,
+                                eyeStyle: QrEyeStyle(eyeShape: QrEyeShape.square, color: _qrColor),
+                                dataModuleStyle: QrDataModuleStyle(
+                                    dataModuleShape: QrDataModuleShape.square, color: _qrColor),
+                              ),
+                              // Drawn separately (rather than via qr_flutter's
+                              // built-in embeddedImage, which paints it as a
+                              // plain square) so the logo can be clipped to a
+                              // circle with a clean white badge behind it.
+                              if (_logoImage != null)
+                                Container(
+                                  width: 54,
+                                  height: 54,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.15),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  padding: const EdgeInsets.all(3),
+                                  child: ClipOval(
+                                    child: Image.file(
+                                      _logoImage!,
+                                      fit: BoxFit.cover,
+                                      width: 48,
+                                      height: 48,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           )
                         : BarcodeWidget(
                             key: const ValueKey('bc'),
@@ -500,6 +565,57 @@ class _GenerateScreenState extends State<GenerateScreen> {
             );
           }).toList(),
         ),
+      ),
+    );
+  }
+
+  Widget _buildLogoPicker(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 4),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: _pickLogo,
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isDark ? AppColors.darkCard : const Color(0xFFF0F1F8),
+                image: _logoImage != null
+                    ? DecorationImage(image: FileImage(_logoImage!), fit: BoxFit.cover)
+                    : null,
+                border: Border.all(
+                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                  width: 1,
+                ),
+              ),
+              child: _logoImage == null
+                  ? Icon(
+                      Icons.add_photo_alternate_outlined,
+                      size: 18,
+                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                    )
+                  : null,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Text(
+            _logoImage == null ? 'Add a logo to the center' : 'Logo added',
+            style: TextStyle(
+              fontSize: 13,
+              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+            ),
+          ),
+          if (_logoImage != null) ...[
+            const Spacer(),
+            TextButton(
+              onPressed: _removeLogo,
+              child: const Text('Remove', style: TextStyle(color: AppColors.coral)),
+            ),
+          ],
+        ],
       ),
     );
   }

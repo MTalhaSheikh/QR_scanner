@@ -1,15 +1,14 @@
-name: qr_code
-description: "A new Flutter project."
+name: scancraft
+description: "ScanCraft — a professional QR & Barcode scanner and generator."
 publish_to: 'none'
-version: 0.1.0
+version: 1.0.0+1
 
 environment:
-  sdk: ^3.9.0
+  sdk: '>=3.3.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-
   cupertino_icons: ^1.0.8
 
   # Camera scanning (QR + all major barcode symbologies)
@@ -22,13 +21,17 @@ dependencies:
   qr_flutter: ^4.1.0
 
   # Barcode generation (Code128, EAN13, UPC-A, Code39, etc.)
-  barcode_widget: ^2.0.4
+  barcode_widget: ^2.0.4  
 
   # Local persistence for scan/generate history
   shared_preferences: ^2.3.2
 
   # Share generated codes / scanned results
   share_plus: ^10.0.2
+
+  # Reliable scan-feedback beep (SystemSound alone is inaudible on many
+  # Android devices, so we bundle and play an actual short tone instead)
+  audioplayers: ^6.1.0
 
   # Open links, dial numbers, compose email/SMS, connect wifi intents
   url_launcher: ^6.3.0
@@ -48,11 +51,12 @@ dependencies:
   # Typography
   google_fonts: ^6.2.1
 
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^4.0.0
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/sounds/

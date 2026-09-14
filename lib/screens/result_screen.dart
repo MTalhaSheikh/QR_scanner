@@ -26,6 +26,8 @@ class ResultScreen extends StatelessWidget {
         return Icons.phone_rounded;
       case 'sms':
         return Icons.sms_rounded;
+      case 'barcode':
+        return Icons.view_week_rounded;
       default:
         return Icons.text_snippet_rounded;
     }
@@ -53,7 +55,7 @@ class ResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final parsed = ContentParser.parse(record.rawValue);
+    final parsed = ContentParser.parse(record.rawValue, symbology: record.symbology);
 
     return Scaffold(
       body: SafeArea(
@@ -199,6 +201,13 @@ class ResultScreen extends StatelessWidget {
       case 'email':
         label = 'Compose Email';
         onTap = () => _launch(context, 'mailto:${parsed.title}');
+        break;
+      case 'barcode':
+        label = 'Search Online';
+        onTap = () => _launch(
+              context,
+              'https://www.google.com/search?q=${Uri.encodeComponent(parsed.title)}',
+            );
         break;
       default:
         label = 'Close';
