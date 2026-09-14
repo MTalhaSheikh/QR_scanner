@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
-/// Draws the dimmed backdrop with a cut-out square scan window, corner
-/// brackets, and an animated scanning laser line — the classic
-/// "professional scanner app" look.
+/// Draws the dimmed backdrop with a cut-out rounded-square scan window and
+/// an animated scanning laser line.
 ///
 /// This widget is designed to be placed inside an `Expanded` (or any other
 /// bounded box) between the header and the bottom controls. It only ever
@@ -76,48 +75,20 @@ class _OverlayPainter extends CustomPainter {
     final overlayPath = Path.combine(PathOperation.difference, backgroundPath, cutoutPath);
     canvas.drawPath(overlayPath, Paint()..color = Colors.black.withOpacity(0.55));
 
-    // Corner brackets
-    final bracketPaint = Paint()
-      ..color = AppColors.accent
-      ..strokeWidth = 5
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
-    const bracketLen = 28.0;
-    final r = rect;
-
-    void corner(Offset a, Offset b, Offset c) {
-      final path = Path()
-        ..moveTo(a.dx, a.dy)
-        ..lineTo(b.dx, b.dy)
-        ..lineTo(c.dx, c.dy);
-      canvas.drawPath(path, bracketPaint);
-    }
-
-    // top-left
-    corner(Offset(r.left, r.top + bracketLen), Offset(r.left, r.top + 14),
-        Offset(r.left + bracketLen, r.top));
-    // top-right
-    corner(Offset(r.right - bracketLen, r.top), Offset(r.right - 14, r.top),
-        Offset(r.right, r.top + bracketLen));
-    // bottom-left
-    corner(Offset(r.left, r.bottom - bracketLen), Offset(r.left, r.bottom - 14),
-        Offset(r.left + bracketLen, r.bottom));
-    // bottom-right
-    corner(Offset(r.right - bracketLen, r.bottom), Offset(r.right - 14, r.bottom),
-        Offset(r.right, r.bottom - bracketLen));
-
-    // Rounded window border
+    // Corner brackets removed — a single clean rounded-rect frame reads
+    // more polished than four separate bracket marks, especially now that
+    // the window sits inside a smaller card instead of the full screen.
     canvas.drawRRect(
       rrect,
       Paint()
-        ..color = Colors.white.withOpacity(0.25)
-        ..strokeWidth = 1.4
+        ..color = AppColors.accent
+        ..strokeWidth = 4.5
         ..style = PaintingStyle.stroke,
     );
 
     // Animated scanning laser line
-    final laserY = r.top + 10 + (r.height - 20) * linePosition;
-    final laserRect = Rect.fromLTWH(r.left + 6, laserY - 1, r.width - 12, 2);
+    final laserY = rect.top + 10 + (rect.height - 20) * linePosition;
+    final laserRect = Rect.fromLTWH(rect.left + 6, laserY - 1, rect.width - 12, 2);
     final laserPaint = Paint()
       ..shader = LinearGradient(
         colors: [

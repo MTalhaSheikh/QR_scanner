@@ -115,65 +115,52 @@ class _ScanScreenState extends State<ScanScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: AppColors.darkBg,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          MobileScanner(
-            controller: _controller,
-            onDetect: _handleDetect,
-          ),
-          SafeArea(
-            child: Column(
-              children: [
-                _buildHeader(context),
-                // The scan frame is placed inside this Expanded, so Flutter's
-                // layout system guarantees it only ever occupies the space
-                // left over between the header and the controls below —
-                // it structurally cannot overlap either one, on any device.
-                const Expanded(child: ScanFrameOverlay()),
-                _buildHint(),
-                const SizedBox(height: 28),
-                _buildControls(),
-                const SizedBox(height: kNavBarClearance),
-              ],
-            ),
-          ),
-          if (_isProcessing)
-            Container(
-              color: Colors.black.withOpacity(0.35),
-              child: const Center(
-                child: CircularProgressIndicator(color: AppColors.accent),
-              ),
-            ),
-        ],
+      // No explicit backgroundColor — inherits the same themed scaffold
+      // background as Create/History, unlike the old always-dark version.
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildHeader(context, isDark),
+            const SizedBox(height: 12),
+            // The camera preview now lives inside a themed card, matching
+            // the QR preview card on the Create screen, instead of taking
+            // over the whole screen behind a dark scrim.
+            Expanded(child: _buildCameraCard(isDark)),
+            const SizedBox(height: 18),
+            _buildHint(isDark),
+            const SizedBox(height: 20),
+            _buildControls(isDark),
+            SizedBox(height: kNavBarClearance),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, bool isDark) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
+          const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
-                'Scan',
-                style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800),
-              ),
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Scan', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800)),
+              SizedBox(height: 2),
               Text(
                 'Point your camera at a QR or barcode',
-                style: TextStyle(color: Colors.white60, fontSize: 13),
+                style: TextStyle(fontSize: 12.5, color: Colors.grey),
               ),
             ],
           ),
-          _circleButton(
+          _actionButton(
             icon: _torchOn ? Icons.flash_on_rounded : Icons.flash_off_rounded,
             active: _torchOn,
+            isDark: isDark,
             onTap: () async {
               await _controller.toggleTorch();
               setState(() => _torchOn = !_torchOn);
@@ -184,31 +171,71 @@ class _ScanScreenState extends State<ScanScreen> {
     );
   }
 
-  Widget _buildHint() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: const Text(
-        'Align the code within the frame',
-        style: TextStyle(color: Colors.white70, fontSize: 12.5, fontWeight: FontWeight.w500),
+  Widget _buildCameraCard(bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkCard : AppColors.lightCard,
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(isDark ? 0.35 : 0.12),
+              blurRadius: 24,
+              offset: const Offset(0, 12),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            MobileScanner(
+              controller: _controller,
+              onDetect: _handleDetect,
+            ),
+            // Confined to this card's bounds by construction (it fills
+            // whatever box its parent gives it) — it can't bleed over the
+            // header or footer the way the old full-screen version could.
+            const ScanFrameOverlay(),
+            if (_isProcessing)
+              Container(
+                color: Colors.black.withOpacity(0.35),
+                child: const Center(
+                  child: CircularProgressIndicator(color: AppColors.accent),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildControls() {
+  Widget _buildHint(bool isDark) {
+    return Text(
+      'Align the code within the frame',
+      style: TextStyle(
+        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+        fontSize: 12.5,
+        fontWeight: FontWeight.w500,
+      ),
+    );
+  }
+
+  Widget _buildControls(bool isDark) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _circleButton(
+        _actionButton(
           icon: Icons.cameraswitch_rounded,
+          isDark: isDark,
           onTap: () => _controller.switchCamera(),
         ),
         const SizedBox(width: 18),
-        _circleButton(
+        _actionButton(
           icon: Icons.image_outlined,
+          isDark: isDark,
           onTap: _pickFromGallery,
           tooltip: 'Scan from a photo',
         ),
@@ -216,26 +243,47 @@ class _ScanScreenState extends State<ScanScreen> {
     );
   }
 
-  Widget _circleButton({
+  /// Same visual language as the Save/Share header buttons on the Create
+  /// screen: a neutral card-grey circle normally, and the brand gradient
+  /// when active — so Scan finally looks like part of the same app.
+  Widget _actionButton({
     required IconData icon,
     required VoidCallback onTap,
+    required bool isDark,
     bool active = false,
     String? tooltip,
   }) {
-    final button = InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(30),
-      child: Container(
-        width: 52,
-        height: 52,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: active ? AppColors.brandGradient : null,
-          color: active ? null : Colors.white.withOpacity(0.12),
-        ),
-        child: Icon(icon, color: Colors.white, size: 24),
+    final circle = Container(
+      width: 48,
+      height: 48,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: active ? AppColors.brandGradient : null,
+        color: active ? null : (isDark ? AppColors.darkCard : const Color(0xFFF0F1F8)),
+        boxShadow: active
+            ? [
+                BoxShadow(
+                  color: AppColors.primary.withOpacity(0.35),
+                  blurRadius: 14,
+                  offset: const Offset(0, 6),
+                ),
+              ]
+            : null,
+      ),
+      child: Icon(
+        icon,
+        size: 22,
+        color: active ? Colors.white : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight),
       ),
     );
+
+    final button = Material(
+      color: Colors.transparent,
+      shape: const CircleBorder(),
+      child: InkWell(onTap: onTap, customBorder: const CircleBorder(), child: circle),
+    );
+
     return tooltip != null ? Tooltip(message: tooltip, child: button) : button;
   }
 }
