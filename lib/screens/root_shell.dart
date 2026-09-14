@@ -14,12 +14,6 @@ class RootShell extends StatefulWidget {
 class _RootShellState extends State<RootShell> {
   int _index = 0;
 
-  final _screens = const [
-    ScanScreen(),
-    GenerateScreen(),
-    HistoryScreen(),
-  ];
-
   final _items = const [
     NavItemData(icon: Icons.qr_code_scanner_outlined, activeIcon: Icons.qr_code_scanner_rounded, label: 'Scan'),
     NavItemData(icon: Icons.auto_awesome_outlined, activeIcon: Icons.auto_awesome_rounded, label: 'Create'),
@@ -30,7 +24,17 @@ class _RootShellState extends State<RootShell> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      body: IndexedStack(index: _index, children: _screens),
+      // Built inline (not stored as a const field) so ScanScreen's
+      // `isActive` flag updates every time the selected tab changes —
+      // that's what lets it pause the camera when it's not on screen.
+      body: IndexedStack(
+        index: _index,
+        children: [
+          ScanScreen(isActive: _index == 0),
+          const GenerateScreen(),
+          const HistoryScreen(),
+        ],
+      ),
       bottomNavigationBar: FloatingNavBar(
         currentIndex: _index,
         onTap: (i) => setState(() => _index = i),

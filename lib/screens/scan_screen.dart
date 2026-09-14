@@ -10,7 +10,13 @@ import '../widgets/scan_frame_overlay.dart';
 import 'result_screen.dart';
 
 class ScanScreen extends StatefulWidget {
-  const ScanScreen({super.key});
+  /// Whether this tab is the one currently visible. RootShell keeps every
+  /// tab mounted (via IndexedStack) so switching tabs is instant and state
+  /// isn't lost — but that means the camera would otherwise keep running
+  /// in the background on other tabs unless we explicitly pause it here.
+  final bool isActive;
+
+  const ScanScreen({super.key, required this.isActive});
 
   @override
   State<ScanScreen> createState() => _ScanScreenState();
@@ -37,6 +43,28 @@ class _ScanScreenState extends State<ScanScreen> {
 
   bool _torchOn = false;
   bool _isProcessing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // MobileScanner auto-starts the camera as soon as it's mounted. If this
+    // tab isn't the visible one on first build, stop it right away.
+    if (!widget.isActive) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _controller.stop());
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant ScanScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isActive == oldWidget.isActive) return;
+    if (widget.isActive) {
+      _controller.start();
+    } else {
+      _controller.stop();
+      if (_torchOn) setState(() => _torchOn = false);
+    }
+  }
 
   @override
   void dispose() {
