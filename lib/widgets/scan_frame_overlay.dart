@@ -86,18 +86,38 @@ class _OverlayPainter extends CustomPainter {
         ..style = PaintingStyle.stroke,
     );
 
-    // Animated scanning laser line
+    // Animated scanning laser line — layered bloom (soft outer glow, tighter
+    // glow, bright core) using the app's own accent color, clipped to the
+    // rounded window so the glow can't bleed onto the dimmed area outside it.
+    canvas.save();
+    canvas.clipRRect(rrect);
+
     final laserY = rect.top + 10 + (rect.height - 20) * linePosition;
-    final laserRect = Rect.fromLTWH(rect.left + 6, laserY - 1, rect.width - 12, 2);
-    final laserPaint = Paint()
-      ..shader = LinearGradient(
-        colors: [
-          AppColors.accent.withOpacity(0.0),
-          AppColors.accent,
-          AppColors.accent.withOpacity(0.0),
-        ],
-      ).createShader(laserRect);
-    canvas.drawRect(laserRect.inflate(1), laserPaint);
+    final laserRect = Rect.fromLTWH(rect.left, laserY, rect.width, 1);
+    final coreColor = Color.lerp(AppColors.accent, Colors.white, 0.55)!;
+
+    Paint glowPaint(double strokeWidth, double blurSigma, double opacity, Color color) {
+      return Paint()
+        ..strokeWidth = strokeWidth
+        ..strokeCap = StrokeCap.round
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, blurSigma)
+        ..shader = LinearGradient(
+          colors: [color.withOpacity(0), color.withOpacity(opacity), color.withOpacity(0)],
+          stops: const [0, 0.5, 1],
+        ).createShader(laserRect);
+    }
+
+    final start = Offset(rect.left + 6, laserY);
+    final end = Offset(rect.right - 6, laserY);
+
+    // wide, soft outer bloom
+    canvas.drawLine(start, end, glowPaint(22, 16, 0.45, AppColors.accent));
+    // tighter mid glow
+    canvas.drawLine(start, end, glowPaint(9, 6, 0.75, AppColors.accent));
+    // bright, near-white core
+    canvas.drawLine(start, end, glowPaint(2.5, 1, 0.95, coreColor));
+
+    canvas.restore();
   }
 
   @override
