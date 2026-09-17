@@ -19,7 +19,7 @@ class ScanCraftApp extends StatelessWidget {
       valueListenable: themeModeNotifier,
       builder: (context, mode, _) {
         return MaterialApp(
-          title: 'ScanCraft',
+          title: 'QR Code Scanner',
           debugShowCheckedModeBanner: false,
           themeMode: mode,
           theme: AppTheme.light(),
