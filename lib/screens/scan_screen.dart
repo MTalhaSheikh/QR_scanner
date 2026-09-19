@@ -8,6 +8,7 @@ import '../services/content_parser.dart';
 import '../services/history_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/layout_constants.dart';
+import '../widgets/banner_ad_card.dart';
 import '../widgets/scan_frame_overlay.dart';
 import 'result_screen.dart';
 
@@ -184,7 +185,12 @@ class _ScanScreenState extends State<ScanScreen> {
             _buildHint(isDark),
             const SizedBox(height: 20),
             _buildControls(isDark),
-            SizedBox(height: kNavBarClearance),
+            const SizedBox(height: 16),
+            const Center(child: Padding(
+              padding: EdgeInsets.only(top: 30.0),
+              child: BannerAdCard(),
+            )),
+            SizedBox(height: kNavBarClearance - 50),
           ],
         ),
       ),

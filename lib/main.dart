@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'services/ad_config.dart';
 import 'theme/app_theme.dart';
 import 'screens/root_shell.dart';
 
@@ -7,6 +8,8 @@ import 'screens/root_shell.dart';
 final ValueNotifier<ThemeMode> themeModeNotifier = ValueNotifier(ThemeMode.system);
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  AdConfig.init(); // fire-and-forget; ad widgets load lazily once ready
   runApp(const ScanCraftApp());
 }
 
@@ -30,3 +33,4 @@ class ScanCraftApp extends StatelessWidget {
     );
   }
 }
+

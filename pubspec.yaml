@@ -50,6 +50,9 @@ dependencies:
   # Typography
   google_fonts: ^6.2.1
 
+  # AdMob banner/interstitial ads
+  google_mobile_ads: ^5.2.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
