@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/scan_record.dart';
 import '../services/history_service.dart';
+import '../services/rating_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/layout_constants.dart';
 import 'result_screen.dart';
@@ -73,12 +74,21 @@ class _HistoryScreenState extends State<HistoryScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text('History', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800)),
-          if (_records.isNotEmpty)
-            TextButton.icon(
-              onPressed: _confirmClearAll,
-              icon: const Icon(Icons.delete_outline_rounded, size: 18, color: AppColors.coral),
-              label: const Text('Clear', style: TextStyle(color: AppColors.coral)),
-            ),
+          Row(
+            children: [
+              IconButton(
+                onPressed: RatingService.openStoreListing,
+                icon: const Icon(Icons.star_border_rounded),
+                tooltip: 'Rate this app',
+              ),
+              if (_records.isNotEmpty)
+                TextButton.icon(
+                  onPressed: _confirmClearAll,
+                  icon: const Icon(Icons.delete_outline_rounded, size: 18, color: AppColors.coral),
+                  label: const Text('Clear', style: TextStyle(color: AppColors.coral)),
+                ),
+            ],
+          ),
         ],
       ),
     );

@@ -65,6 +65,9 @@ dev_dependencies:
   # build is published (Android only; see services/update_service.dart)
   in_app_update: ^4.2.3
 
+  # Native "rate this app" popup (Play In-App Review / iOS SKStoreReviewController)
+  in_app_review: ^2.0.9
+
 flutter:
   uses-material-design: true
 

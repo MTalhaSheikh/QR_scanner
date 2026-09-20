@@ -6,6 +6,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import '../models/scan_record.dart';
 import '../services/content_parser.dart';
 import '../services/history_service.dart';
+import '../services/rating_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/layout_constants.dart';
 import '../widgets/banner_ad_card.dart';
@@ -115,6 +116,11 @@ class _ScanScreenState extends State<ScanScreen> {
       timestamp: DateTime.now(),
     );
     await HistoryService.instance.add(record);
+    // A completed scan is a good "things are going well" signal — this
+    // only actually shows a popup once conditions are met (see
+    // RatingService for the full reasoning), so it's safe to call here
+    // unconditionally on every successful scan.
+    RatingService.recordPositiveMomentAndMaybeAsk();
 
     if (!mounted) return;
     await Navigator.of(context).push(
@@ -159,6 +165,7 @@ class _ScanScreenState extends State<ScanScreen> {
       timestamp: DateTime.now(),
     );
     await HistoryService.instance.add(record);
+    RatingService.recordPositiveMomentAndMaybeAsk();
 
     if (!mounted) return;
     Navigator.of(context).push(
