@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/update_service.dart';
 import '../widgets/floating_nav_bar.dart';
 import 'scan_screen.dart';
 import 'generate_screen.dart';
@@ -19,6 +20,16 @@ class _RootShellState extends State<RootShell> {
     NavItemData(icon: Icons.auto_awesome_outlined, activeIcon: Icons.auto_awesome_rounded, label: 'Create'),
     NavItemData(icon: Icons.history_outlined, activeIcon: Icons.history_rounded, label: 'History'),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Checked once per app open, after the first frame so a SnackBar has
+    // somewhere to attach to if a flexible update finishes downloading.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) UpdateService.checkForUpdate(context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -186,11 +186,8 @@ class _ScanScreenState extends State<ScanScreen> {
             const SizedBox(height: 20),
             _buildControls(isDark),
             const SizedBox(height: 16),
-            const Center(child: Padding(
-              padding: EdgeInsets.only(top: 30.0),
-              child: BannerAdCard(),
-            )),
-            SizedBox(height: kNavBarClearance - 50),
+            const Center(child: BannerAdCard()),
+            SizedBox(height: kNavBarClearance),
           ],
         ),
       ),

@@ -61,6 +61,10 @@ dev_dependencies:
   # App icon generator
   flutter_launcher_icons: ^0.14.3
 
+  # Google Play In-App Updates — prompts/forces users to update when a new
+  # build is published (Android only; see services/update_service.dart)
+  in_app_update: ^4.2.3
+
 flutter:
   uses-material-design: true
 
