@@ -8,6 +8,7 @@ import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import '../models/scan_record.dart';
 import '../services/history_service.dart';
+import '../services/rewarded_ad_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/layout_constants.dart';
 
@@ -222,14 +223,18 @@ class _GenerateScreenState extends State<GenerateScreen> {
               _headerActionButton(
                 context: context,
                 icon: Icons.bookmark_outline_rounded,
-                onTap: _hasContent ? _saveToHistory : null,
+                onTap: _hasContent
+                    ? () => RewardedAdService.instance.runGated(_saveToHistory)
+                    : null,
                 tooltip: 'Save to history',
               ),
               const SizedBox(width: 10),
               _headerActionButton(
                 context: context,
                 icon: Icons.ios_share_rounded,
-                onTap: _hasContent ? _shareCode : null,
+                onTap: _hasContent
+                    ? () => RewardedAdService.instance.runGated(_shareCode)
+                    : null,
                 tooltip: 'Share',
                 filled: true,
               ),

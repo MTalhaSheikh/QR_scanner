@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'services/ad_config.dart';
+import 'services/rewarded_ad_service.dart';
 import 'theme/app_theme.dart';
 import 'screens/root_shell.dart';
 
@@ -7,9 +8,10 @@ import 'screens/root_shell.dart';
 /// flip between light and dark without a state-management package.
 final ValueNotifier<ThemeMode> themeModeNotifier = ValueNotifier(ThemeMode.system);
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  AdConfig.init(); // fire-and-forget; ad widgets load lazily once ready
+  await AdConfig.init();
+  RewardedAdService.instance.preload(); // have one ready before Save/Share is tapped
   runApp(const ScanCraftApp());
 }
 

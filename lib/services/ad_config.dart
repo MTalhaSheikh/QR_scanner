@@ -35,6 +35,21 @@ class AdConfig {
     return _androidTestBanner;
   }
 
+  // ---- Rewarded ad unit IDs (shown before Save/Share, every other time —
+  // see services/rewarded_ad_service.dart) ----
+  static const String _androidTestRewarded = 'ca-app-pub-3940256099942544/5224354917';
+  static const String _iosTestRewarded = 'ca-app-pub-3940256099942544/1712485313';
+
+  // TODO: put your real rewarded ad unit IDs here, then set useTestAds = false.
+  static const String _androidRealRewarded = 'ca-app-pub-3940256099942544/5224354917';
+  static const String _iosRealRewarded = 'ca-app-pub-3940256099942544/1712485313';
+
+  static String get rewardedAdUnitId {
+    if (Platform.isAndroid) return useTestAds ? _androidTestRewarded : _androidRealRewarded;
+    if (Platform.isIOS) return useTestAds ? _iosTestRewarded : _iosRealRewarded;
+    return _androidTestRewarded;
+  }
+
   static Future<void> init() async {
     // Ads aren't supported on the web/desktop targets this project doesn't
     // ship to, but guard anyway so a stray platform never crashes startup.
