@@ -1,7 +1,7 @@
 name: qr_code_scanner
 description: "ScanCraft — a professional QR & Barcode scanner and generator."
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -9,10 +9,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.8
+  cupertino_icons: ^2.0.0
 
   # Camera scanning (QR + all major barcode symbologies)
-  mobile_scanner: ^5.2.3
+  mobile_scanner: ^7.4.2
 
   # Pick an existing photo from the gallery to scan
   image_picker: ^1.1.2
@@ -27,7 +27,7 @@ dependencies:
   shared_preferences: ^2.3.2
 
   # Share generated codes / scanned results
-  share_plus: ^10.0.2
+  share_plus: ^13.3.1
 
   # Reliable scan-feedback beep
   audioplayers: ^6.1.0
@@ -36,7 +36,7 @@ dependencies:
   url_launcher: ^6.3.0
 
   # Camera / storage permissions
-  permission_handler: ^11.3.1
+  permission_handler: ^13.0.2
 
   # File paths for saving generated code images
   path_provider: ^2.1.4
@@ -45,26 +45,27 @@ dependencies:
   screenshot: ^3.0.0
 
   # Nicely formatted dates in history
-  intl: ^0.19.0
+  intl: ^0.20.3
 
   # Typography
-  google_fonts: ^6.2.1
+  google_fonts: ^8.2.1
 
   # AdMob banner/interstitial ads
-  google_mobile_ads: ^5.2.0
+  google_mobile_ads: ^9.1.0
   change_app_package_name: ^1.5.0
+  flutter_native_splash: ^2.3.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0
+  flutter_lints: ^6.0.0
 
   # App icon generator
   flutter_launcher_icons: ^0.14.3
 
   # Google Play In-App Updates — prompts/forces users to update when a new
   # build is published (Android only; see services/update_service.dart)
-  in_app_update: ^4.2.3
+  in_app_update: ^4.2.5
 
   # Native "rate this app" popup (Play In-App Review / iOS SKStoreReviewController)
   in_app_review: ^2.0.9
@@ -80,3 +81,23 @@ flutter_launcher_icons:
   android: true
   ios: true
   image_path: "assets/icon/app_icon.png"
+
+
+flutter_native_splash:
+  color: "#5B5FEF"
+  image: assets/images/splash_image.png
+ 
+  # same look when the phone is in dark mode
+  color_dark: "#5B5FEF"
+  image_dark: assets/images/splash_image.png
+ 
+  android_gravity: center
+  ios_content_mode: center
+  fullscreen: true
+ 
+  # Android 12+ shows a colour + icon only
+  android_12:
+    color: "#5B5FEF"
+    image: assets/images/splash_icon.png
+    color_dark: "#5B5FEF"
+    image_dark: assets/images/splash_icon.png

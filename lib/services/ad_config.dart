@@ -4,30 +4,38 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 /// Centralized AdMob setup.
 ///
-/// IMPORTANT — before you publish this app, replace every ID below with
-/// your own real AdMob App ID / Ad Unit IDs from https://apps.admob.com.
-/// The IDs here are Google's official *test* IDs — they always serve a
-/// placeholder "Test Ad" and are safe to leave in during development, but
-/// using test IDs (or your real IDs without real traffic) in a published
-/// app is fine; using someone else's real IDs, or clicking your own real
-/// ads to test them, violates AdMob policy and can get an account banned.
+/// ANDROID — real IDs are now wired in below (from your AdMob "QR code
+/// scanner" app, created Oct 2026).
+///
+/// IOS — still Google's *test* IDs below (placeholders). You haven't set
+/// up an iOS app in AdMob yet, so there's nothing real to put here. These
+/// test IDs are completely safe to ship as-is in the meantime: they're
+/// Google's official public sample ad units, so they'll never error or
+/// crash, they just always serve a harmless "Test Ad" placeholder — i.e.
+/// no iOS ad revenue until you repeat the AdMob setup for iOS and swap
+/// these two for real ones.
+///
+/// Using someone else's real IDs, or clicking your own real ads to "test"
+/// them, violates AdMob policy and can get an account banned — never do
+/// either of those.
 class AdConfig {
   AdConfig._();
 
-  /// Set this to `false` once you've dropped in your real AdMob IDs below.
-  static const bool useTestAds = true;
+  /// Real Android IDs are in place, so this is off. Flip back to `true`
+  /// only if you ever want to temporarily force test ads again (e.g. to
+  /// debug something) without touching the IDs below.
+  static const bool useTestAds = false;
 
   // ---- App IDs (also required in AndroidManifest.xml / Info.plist) ----
-  static const String androidAppId = 'ca-app-pub-3940256099942544~3347511713';
-  static const String iosAppId = 'ca-app-pub-3940256099942544~1458002511';
+  static const String androidAppId = 'ca-app-pub-6613460832066685~5550783455';
+  static const String iosAppId = 'ca-app-pub-3940256099942544~1458002511'; // TODO: set up iOS in AdMob
 
   // ---- Banner ad unit IDs ----
   static const String _androidTestBanner = 'ca-app-pub-3940256099942544/6300978111';
   static const String _iosTestBanner = 'ca-app-pub-3940256099942544/2934735716';
 
-  // TODO: put your real banner ad unit IDs here, then set useTestAds = false.
-  static const String _androidRealBanner = 'ca-app-pub-3940256099942544/6300978111';
-  static const String _iosRealBanner = 'ca-app-pub-3940256099942544/2934735716';
+  static const String _androidRealBanner = 'ca-app-pub-6613460832066685/6480721740';
+  static const String _iosRealBanner = 'ca-app-pub-3940256099942544/2934735716'; // TODO: real iOS banner ID
 
   static String get bannerAdUnitId {
     if (Platform.isAndroid) return useTestAds ? _androidTestBanner : _androidRealBanner;
@@ -40,9 +48,8 @@ class AdConfig {
   static const String _androidTestRewarded = 'ca-app-pub-3940256099942544/5224354917';
   static const String _iosTestRewarded = 'ca-app-pub-3940256099942544/1712485313';
 
-  // TODO: put your real rewarded ad unit IDs here, then set useTestAds = false.
-  static const String _androidRealRewarded = 'ca-app-pub-3940256099942544/5224354917';
-  static const String _iosRealRewarded = 'ca-app-pub-3940256099942544/1712485313';
+  static const String _androidRealRewarded = 'ca-app-pub-6613460832066685/1280365952';
+  static const String _iosRealRewarded = 'ca-app-pub-3940256099942544/1712485313'; // TODO: real iOS rewarded ID
 
   static String get rewardedAdUnitId {
     if (Platform.isAndroid) return useTestAds ? _androidTestRewarded : _androidRealRewarded;

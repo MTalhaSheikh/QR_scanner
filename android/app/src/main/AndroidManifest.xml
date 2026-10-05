@@ -20,7 +20,7 @@
              it in place will only ever serve test ads. -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+            android:value="ca-app-pub-6613460832066685~5550783455" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
